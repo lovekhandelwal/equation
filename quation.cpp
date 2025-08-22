@@ -101,24 +101,18 @@ void extractNestedData(const string& filename, int& n, int& k, vector<Root>& roo
     }
     
     while (getline(file, line)) {
-        // Remove whitespace
         line.erase(remove_if(line.begin(), line.end(), ::isspace), line.end());
         
         if (line.empty()) continue;
-        
-        // Check if we're entering keys section
         if (line.find("\"keys\":{") != string::npos) {
             inKeys = true;
             continue;
         }
-        
-        // Check if we're leaving keys section
+
         if (inKeys && line == "},") {
             inKeys = false;
             continue;
         }
-        
-        // Parse keys
         if (inKeys) {
             line.erase(remove_if(line.begin(), line.end(), [](char c) { return c == '"'; }), line.end());
             if (line.find("n:") != string::npos) {
@@ -129,22 +123,18 @@ void extractNestedData(const string& filename, int& n, int& k, vector<Root>& roo
             continue;
         }
         
-        // Check if we're entering a root section
+        // Check for root section
         if (line.find("\"") != string::npos && line.find(":{") != string::npos) {
             string rootNum = line.substr(line.find("\"") + 1, line.find("\"", line.find("\"") + 1) - line.find("\"") - 1);
             currentRoot = stoi(rootNum);
             inRoot = true;
             continue;
         }
-        
-        // Check if we're leaving a root section
         if (inRoot && line == "},") {
             inRoot = false;
             currentRoot = -1;
             continue;
         }
-        
-        // Parse root data
         if (inRoot && currentRoot != -1) {
             line.erase(remove_if(line.begin(), line.end(), [](char c) { return c == '"'; }), line.end());
             
@@ -155,7 +145,6 @@ void extractNestedData(const string& filename, int& n, int& k, vector<Root>& roo
                 Root root;
                 root.x = currentRoot;
                 root.base = stoi(baseStr);
-                
                 // Find the value in the next line
                 string nextLine;
                 getline(file, nextLine);
@@ -180,7 +169,6 @@ void extractNestedData(const string& filename, int& n, int& k, vector<Root>& roo
     file.close();
 }
 
-// Function to calculate Lagrange interpolation
 vector<long long> lagrangeInterpolation(const vector<Root>& roots) {
     int n = roots.size();
     vector<long long> coefficients(n, 0);
@@ -213,7 +201,6 @@ vector<long long> lagrangeInterpolation(const vector<Root>& roots) {
             coefficients[k] += (term[k] * roots[i].y) / denominator;
         }
     }
-    
     return coefficients;
 }
 
@@ -239,7 +226,6 @@ void printPolynomial(const vector<long long>& coefficients) {
     }
     cout << endl;
 }
-
 int main() {
     cout << "=== Polynomial Interpolation Solver ===" << endl;
     
@@ -309,6 +295,5 @@ int main() {
         
         cout << "f(" << root.x << ") = " << result << " (expected: " << root.y << ")" << endl;
     }
-    
     return 0;
 }
